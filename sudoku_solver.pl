@@ -1,3 +1,4 @@
+% Modified from:
 %=============================================================================
 %     FileName: sudoku_solver.pl
 %         Desc: sudoku solver 
@@ -9,6 +10,8 @@
 %        Email: kuoe0.tw@gmail.com
 %     HomePage: http://kuoe0.ch/
 %=============================================================================
+
+:- dynamic row_used/2, col_used/2, block_used/2.
 
 % index conversion
 get_index(Row, Col, Idx) :- Idx is Row * 9 + Col.
@@ -68,12 +71,25 @@ solve([Num|Remain], Sol, Idx) :-
 	modify_cons(block_used(B, X)),
 	Idx1 is Idx + 1, solve(Remain, Sol1, Idx1), Sol = [X|Sol1].
 
+prob_in(
+	"0 0 5 3 0 0 0 0 0 8 0 0 0 0 0 0 2 0 0 7 0 0 1 0 5 0 0 4 0 0 0 0 5 3 0 0 0 1 0 0 7 0 0 0 6 0 0 3 2 0 0 0 8 0 0 6 0 5 0 0 0 0 9 0 0 4 0 0 0 0 3 0 0 0 0 0 0 9 7 0 0").
+
+mock_readln(Prob) :-
+	prob_in(ProbIn),
+	split_string(ProbIn, " ", "", ProbStrings),
+	maplist(number_string, Prob, ProbStrings).
+
+sudoku_solver(Sol) :-
+	mock_readln(Sudoku_prob), 
+	solve_sudoku(Sudoku_prob, Sol),
+	forall(member(X, Sol), (write(X), tab(1))).
+
 sudoku_solver :-
 	readln(Sudoku_prob), 
 	solve_sudoku(Sudoku_prob, Sol), 
 	forall(member(X, Sol), (write(X), tab(1))), halt.
 
-:- initialization(sudoku_solver).
+% :- initialization(sudoku_solver).
 
 % sample input: 0 0 5 3 0 0 0 0 0 8 0 0 0 0 0 0 2 0 0 7 0 0 1 0 5 0 0 4 0 0 0 0 5 3 0 0 0 1 0 0 7 0 0 0 6 0 0 3 2 0 0 0 8 0 0 6 0 5 0 0 0 0 9 0 0 4 0 0 0 0 3 0 0 0 0 0 0 9 7 0 0
 % sample output: 1 4 5 3 2 7 6 9 8 8 3 9 6 5 4 1 2 7 6 7 2 9 1 8 5 4 3 4 9 6 1 8 5 3 7 2 2 1 8 4 7 3 9 5 6 7 5 3 2 9 6 4 8 1 3 6 7 5 4 2 8 1 9 9 8 4 7 6 1 2 3 5 5 2 1 8 3 9 7 6 4 
